@@ -1,11 +1,27 @@
 import os
 
 from flask import (Flask, redirect, render_template, request,
-                   send_from_directory, url_for)
+                   send_from_directory, url_for, send_file)
+from emoailib.text_to_speech import synthesize_speech
 
 app = Flask(__name__)
 
 
+
+@app.route('/synthesize', methods=['POST'])
+def synthesize_route():
+    subscription_key = "998723bccc394ddb89b2ffe73bb91651"
+    region = "eastus"
+    text = request.form['text']
+    output_filename = 'output_audio.mp3'
+    voice_name='voice_name'
+    success = synthesize_speech(text, voice_name=voice_name, filename=output_filename, subscription_key=subscription_key, region=region)
+
+    if success:
+        return send_file(output_filename, as_attachment=True)
+    else:
+        return "Text-to-Speech synthesis failed"
+    
 @app.route('/')
 def index():
    print('Request for index page received')
